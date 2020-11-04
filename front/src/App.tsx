@@ -16,14 +16,17 @@ function App() {
     const scrollHeight : number = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     const scrollTop : number = Math.round(Math.max(document.documentElement.scrollTop, document.body.scrollTop));
     const clientHeight : number = document.documentElement.clientHeight;
-
+    console.log(scrollTop + clientHeight === scrollHeight);
+    
     if(scrollTop + clientHeight === scrollHeight ){
-        setOldItems(newItems); 
-        setNewItems(newItems+12);
+        setOldItems(oldItmes => oldItmes +12); 
+        setNewItems(newItems=>newItems+12);
+        console.log(newItems);
     }
   }
 const getUser = async ()=>{
   const data = await callBackAPI();
+  
   if(users.length === 0){
     setUsers(data);
     return;
@@ -31,10 +34,15 @@ const getUser = async ()=>{
   setUsers(users.concat(data));
 }
 
+useEffect(()=>{
+  window.addEventListener('scroll',infiniteScroll);
+  console.log(1);
 
+},[]);
   useEffect(() => {
-    window.addEventListener('scroll',infiniteScroll,true);
     getUser();
+    console.log(2);
+    
   },[newItems]);
   
 
@@ -45,10 +53,17 @@ const getUser = async ()=>{
     const gitApi: string = 'https://api.github.com/users';
     
      return  Axios.get(gitApi).then((res)=>{
-      const newUser = res.data.slice(oldItems,newItems);   
 
-       if(newUser.length !== 12 ){
-            window.removeEventListener('scroll',infiniteScroll,true);
+      console.log(`oldItmes : ${oldItems}` );
+
+      console.log(`newItmes : ${newItems}` );
+
+      const newUser = res.data.slice(oldItems,newItems);   
+      if (newUser.length === 0){
+        alert("마지막페이지 입니다.");
+        return [];
+      }
+     else  if(newUser.length !== 12 ){
             return newUser;
       }else{
         return newUser;
